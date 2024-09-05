@@ -8,7 +8,7 @@ from typing import Any
 from modules.params.diffusion.inference_params import InferenceParams
 from modules.loader.module_loader import GenericModuleLoader
 from modules.params.diffusion_trainer.params_streaming_diff_trainer import DiffusionTrainerParams
-
+from models.svd.sgm.modules import GeneralConditioner
 
 class AbstractTrainer(pl.LightningModule):
 
@@ -16,6 +16,7 @@ class AbstractTrainer(pl.LightningModule):
                  inference_params: Any,
                  diff_trainer_params: DiffusionTrainerParams,
                  module_loader: GenericModuleLoader,
+                 conditioner: GeneralConditioner,
                  ):
 
         super().__init__()
@@ -23,6 +24,7 @@ class AbstractTrainer(pl.LightningModule):
         self.inference_params = inference_params
         self.diff_trainer_params = diff_trainer_params
         self.module_loader = module_loader
+        self.conditioner = conditioner
 
         self.on_start_once_called = False
         self._setup_methods = []

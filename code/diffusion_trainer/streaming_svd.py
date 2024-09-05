@@ -20,7 +20,7 @@ from typing import List,Union
 from models.diffusion.wrappers import StreamingWrapper
 from diffusion_trainer.abstract_trainer import AbstractTrainer
 from utils.loader import download_ckpt
-
+from models.svd.sgm.modules import GeneralConditioner
 
 class StreamingSVD(AbstractTrainer):
     def __init__(self,
@@ -29,10 +29,12 @@ class StreamingSVD(AbstractTrainer):
                  inference_params: InferenceParams,
                  vfi: VFIParams,
                  i2v_enhance: I2VEnhanceParams,
+                 conditioner: GeneralConditioner,
                  ):
         super().__init__(inference_params=inference_params,
                          diff_trainer_params=diff_trainer_params,
                          module_loader=module_loader,
+                         conditioner=conditioner,
                          )
 
         # network config is wrapped by OpenAIWrapper, so we dont need a direct reference anymore

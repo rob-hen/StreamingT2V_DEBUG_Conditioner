@@ -155,66 +155,7 @@ model:
                   num_frames: 25
               verbose: false
               device: cuda
-          conditioner:
-            class_path: models.svd.sgm.modules.GeneralConditioner
-            init_args:
-              emb_models:
-              - is_trainable: false
-                input_key: cond_frames_without_noise
-                target: models.svd.sgm.modules.encoders.modules.FrozenOpenCLIPImagePredictionEmbedder
-                params:
-                  n_cond_frames: 1
-                  n_copies: 1
-                  open_clip_embedding_config:
-                    target: models.svd.sgm.modules.encoders.modules.FrozenOpenCLIPImageEmbedder
-                    params:
-                      freeze: true
-              - input_key: fps_id
-                is_trainable: false
-                target: models.svd.sgm.modules.encoders.modules.ConcatTimestepEmbedderND
-                params:
-                  outdim: 256
-              - input_key: motion_bucket_id
-                is_trainable: false
-                target: models.svd.sgm.modules.encoders.modules.ConcatTimestepEmbedderND
-                params:
-                  outdim: 256
-              - input_key: cond_frames
-                is_trainable: false
-                target: models.svd.sgm.modules.encoders.modules.VideoPredictionEmbedderWithEncoder
-                params:
-                  disable_encoder_autocast: true
-                  n_cond_frames: 1
-                  n_copies: 1
-                  is_ae: true
-                  encoder_config:
-                    target: models.svd.sgm.models.autoencoder.AutoencoderKLModeOnly
-                    params:
-                      embed_dim: 4
-                      monitor: val/rec_loss
-                      ddconfig:
-                        attn_type: vanilla-xformers
-                        double_z: true
-                        z_channels: 4
-                        resolution: 256
-                        in_channels: 3
-                        out_ch: 3
-                        ch: 128
-                        ch_mult:
-                        - 1
-                        - 2
-                        - 4
-                        - 4
-                        num_res_blocks: 2
-                        attn_resolutions: []
-                        dropout: 0.0
-                      lossconfig:
-                        target: torch.nn.Identity
-              - input_key: cond_aug
-                is_trainable: false
-                target: models.svd.sgm.modules.encoders.modules.ConcatTimestepEmbedderND
-                params:
-                  outdim: 256
+          
           first_stage_model:
             class_path: models.svd.sgm.AutoencodingEngine
             init_args:
@@ -314,3 +255,63 @@ model:
         num_conditional_frames: 7 # is this used?
         anchor_frames: '6'  #  Take the (Number+1)th frame as CLIP encoding for StreamingSVD
         reset_seed_per_generation: true # If true, the seed is reset on every generation
+    conditioner:
+      class_path: models.svd.sgm.modules.GeneralConditioner
+      init_args:
+        emb_models:
+        - is_trainable: false
+          input_key: cond_frames_without_noise
+          target: models.svd.sgm.modules.encoders.modules.FrozenOpenCLIPImagePredictionEmbedder
+          params:
+            n_cond_frames: 1
+            n_copies: 1
+            open_clip_embedding_config:
+              target: models.svd.sgm.modules.encoders.modules.FrozenOpenCLIPImageEmbedder
+              params:
+                freeze: true
+        - input_key: fps_id
+          is_trainable: false
+          target: models.svd.sgm.modules.encoders.modules.ConcatTimestepEmbedderND
+          params:
+            outdim: 256
+        - input_key: motion_bucket_id
+          is_trainable: false
+          target: models.svd.sgm.modules.encoders.modules.ConcatTimestepEmbedderND
+          params:
+            outdim: 256
+        - input_key: cond_frames
+          is_trainable: false
+          target: models.svd.sgm.modules.encoders.modules.VideoPredictionEmbedderWithEncoder
+          params:
+            disable_encoder_autocast: true
+            n_cond_frames: 1
+            n_copies: 1
+            is_ae: true
+            encoder_config:
+              target: models.svd.sgm.models.autoencoder.AutoencoderKLModeOnly
+              params:
+                embed_dim: 4
+                monitor: val/rec_loss
+                ddconfig:
+                  attn_type: vanilla-xformers
+                  double_z: true
+                  z_channels: 4
+                  resolution: 256
+                  in_channels: 3
+                  out_ch: 3
+                  ch: 128
+                  ch_mult:
+                  - 1
+                  - 2
+                  - 4
+                  - 4
+                  num_res_blocks: 2
+                  attn_resolutions: []
+                  dropout: 0.0
+                lossconfig:
+                  target: torch.nn.Identity
+        - input_key: cond_aug
+          is_trainable: false
+          target: models.svd.sgm.modules.encoders.modules.ConcatTimestepEmbedderND
+          params:
+            outdim: 256
